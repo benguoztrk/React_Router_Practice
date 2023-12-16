@@ -9,6 +9,8 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import api from "./api/posts";
+import useWindowSize from "./hooks/useWindowsSize";
+import useAxiosFetch from "./hooks/useAxiosFetch";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -19,33 +21,42 @@ function App() {
   const [editTitle, setEditTitle] = useState("");
   const [editBody, setEditBody] = useState("");
   const navigate = useNavigate();
+  const { width } = useWindowSize();
+  const { data, fetchError, isLoading } = useAxiosFetch(
+    "http://localhost:3500/posts"
+  );
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await api.get("/posts");
+    setPosts(data);
+  }, [data]);
 
-        setPosts(response.data);
-      } catch (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log("Error", error.message);
-        }
-      }
-    };
-    fetchPosts();
-  }, []);
+  //This is the useEffect that I use before implementing the custom hook useAxiosFetch.
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const response = await api.get("/posts");
+
+  //       setPosts(response.data);
+  //     } catch (error) {
+  //       if (error.response) {
+  // The request was made and the server responded with a status code
+  // that falls out of the range of 2xx
+  //         console.log(error.response.data);
+  //         console.log(error.response.status);
+  //         console.log(error.response.headers);
+  //       } else if (error.request) {
+  // The request was made but no response was received
+  // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+  // http.ClientRequest in node.js
+  //         console.log(error.request);
+  //       } else {
+  // Something happened in setting up the request that triggered an Error
+  //         console.log("Error", error.message);
+  //       }
+  //     }
+  //   };
+  //   fetchPosts();
+  // }, []);
 
   useEffect(() => {
     const filteredResults = posts.filter(
@@ -113,9 +124,18 @@ function App() {
     <Routes>
       <Route
         path="/"
-        element={<Layout search={search} setSearch={setSearch} />}
+        element={<Layout width={width} search={search} setSearch={setSearch} />}
       >
-        <Route index element={<Home posts={searchResults} />} />
+        <Route
+          index
+          element={
+            <Home
+              posts={searchResults}
+              fetchError={fetchError}
+              isLoading={isLoading}
+            />
+          }
+        />
         <Route path="post">
           <Route
             index
@@ -133,23 +153,23 @@ function App() {
             path=":id"
             element={<PostPage posts={posts} handleDelete={handleDelete} />}
           />
-        </Route>
-        {/* <Route path="edit/:id"> */}
-        <Route
-          path="edit/:id"
-          element={
-            <EditPost
-              posts={posts}
-              handleEdit={handleEdit}
-              editTitle={editTitle}
-              setEditTitle={setEditTitle}
-              editBody={editBody}
-              setEditBody={setEditBody}
+          <Route path="edit/:id">
+            <Route
+              index
+              element={
+                <EditPost
+                  posts={posts}
+                  handleEdit={handleEdit}
+                  editTitle={editTitle}
+                  setEditTitle={setEditTitle}
+                  editBody={editBody}
+                  setEditBody={setEditBody}
+                />
+              }
             />
-          }
-        />
-        {/* <Route path=":id" element={<PostPage posts={posts} />} /> */}
-        {/* </Route> */}
+            {/* <Route path=":id" element={<PostPage posts={posts} />} /> */}
+          </Route>
+        </Route>
 
         <Route path="about" element={<About />} />
         <Route path="*" element={<Missing />} />

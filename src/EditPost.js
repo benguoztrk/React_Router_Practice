@@ -52,7 +52,7 @@ const EditPost = (
       )}
       {!editTitle && (
         <>
-          <h2>Post Not Foundddd</h2>
+          <h2>Post Not Found editpost</h2>
           <p>Well, that's disappointing.</p>
           <p>
             <Link to="/">Visit Our Homepage</Link>

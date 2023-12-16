@@ -1,14 +1,21 @@
 import Feed from "./Feed";
 
-const Home = ({ posts }) => {
+const Home = ({ posts, fetchError, isLoading }) => {
   return (
     <main className="Home">
-      {/* check the posts length with ternary. If they have length display feed component. This feed component receives the posts as prop. If does not have length, display a paragraf saying "No posts to display" with inline css */}
-      {posts.length ? (
-        <Feed posts={posts} />
-      ) : (
-        <p style={{ marginTop: "2rem" }}>No posts to display.</p>
+      {isLoading && <p className="statusMsg">Loading posts...</p>}
+      {!isLoading && fetchError && (
+        <p className="statusMsg" style={{ color: "red" }}>
+          {fetchError}
+        </p>
       )}
+      {!isLoading &&
+        !fetchError &&
+        (posts.length ? (
+          <Feed posts={posts} />
+        ) : (
+          <p className="statusMsg">No posts to display.</p>
+        ))}
     </main>
   );
 };

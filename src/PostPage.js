@@ -26,7 +26,7 @@ const PostPage = ({ posts, handleDelete, handleEdit }) => {
         {/* if a post does not exits do this */}
         {!post && (
           <>
-            <h2>Post Not Found</h2>
+            <h2>Post Not Found post page</h2>
             <p>Well, that's disappointing.</p>
             <p>
               <Link to="/">Visit Our Homepage</Link>
